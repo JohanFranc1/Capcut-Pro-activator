@@ -8,6 +8,9 @@
 // -------------------------------- Change Log ------------------------------ //
 // -- Version 1.0.0 --
 // • Initial Release
+// -- Version 1.0.1
+// • Fixed Auto Mode Bug on Normal Monster
+// • Add function check monster before start recovery mode
 // -------------------------------------------------------------------------- //
 
 // ------------------------------ Configuration ----------------------------- //
@@ -359,9 +362,13 @@ if #red == #sp_red and #green == #sp_green and #blue == #sp_blue and #recov_mode
 	goto :play_dead
 endif
 
-:check_monster
+if #hydra_mode_active == 0
+	goto :check_monster
+endif
+
+:check_monster_hydra
 getRGB #red #green #blue #mx #my
-if #red == #monster_r and #green == #monster_g and #blue == #monster_b and #hydra_mode_active == 1
+if #red == #monster_r and #green == #monster_g and #blue == #monster_b
 	getRGB #red #green #blue 300 178
 	if #red == #monster_r2 and #green == #monster_g2 and #blue == #monster_b2
 		Toast Target found! Wait for #tdelay secs...
@@ -370,9 +377,13 @@ if #red == #monster_r and #green == #monster_g and #blue == #monster_b and #hydr
 		else
 		goto :fly
 	endif
-elseif #red == #monster_r and #green == #monster_g and #blue == #monster_b and #hydra_mode_active == 0
-	Toast Target found! Wait for #delay secs...
-	sleep #tdelay
+endif
+
+:check_monster
+getRGB #red #green #blue #mx #my
+if #red == #monster_r and #green == #monster_g and #blue == #monster_b
+	Toast Target found! Wait for #tdelay secs...
+	sleep #delay
 	goto :start
 endif
 
@@ -404,6 +415,12 @@ Toast Recover mode start!
 Set #caller 1
 goto :fly
 :play_dead2
+getRGB #red #green #blue 309 139
+if #red == 221 and #green == 255 and #blue == 9
+	Toast You are being targeted!
+	Calc #timer #timer + 3000
+	goto :fly
+endif
 touchDown 0 #pdx #pdy
 touchUp 0
 Toast Play Dead...
@@ -430,6 +447,12 @@ Toast Recover mode start!
 Set #caller 2
 goto :fly
 :resting2
+getRGB #red #green #blue 309 139
+if #red == 221 and #green == 255 and #blue == 9
+	Toast You are being targeted!
+	Calc #timer #timer + 3000
+	goto :fly
+endif
 touchDown 0 63 571
 touchUp 0
 sleep 700
